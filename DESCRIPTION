@@ -1,10 +1,10 @@
 Package: mappdmp
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Query and manipulate data from Mapp Data Management Platform (DMP)
 Version: 0.1
 Date: 2017-03-24
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Jan Fait
+Maintainer: jan.fait@mapp.com
+Description: The package provides user with an instance of mappdmp class which allows the user to query data (both stateless and batch exports) from Mapp's DMP in simple one-line manner.
+License: AGPL-3
 LazyData: TRUE
