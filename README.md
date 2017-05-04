@@ -27,40 +27,44 @@ or simply source the main class dmpClass.R in the R folder which contains all th
 All you need really are the login credentials. To understand what the package is doing in the background, you can initialize it 
 with debug=T parameter. 
 ```r
-import mappdmp
 my_dmp <- mappDmp$new("username","password",debug=T)
 ```
 ### Login
 The login function is implicit. This means that whenever the package calls the Mapp DMP API, it will check the existing session and if the token is not present or expired, it will trigger the login() function. If however you want to test your login credentials, you can just do:
-
+Authentication details you have supplied upon initialization are stored in the $username and $password fields and this is where the login() function gets them from
 ```r
 my_dmp$login()
-#returns TRUE or FALSE
 ```
 
 ## Getting Data
 
-The core function of the package is the get_data() function.
+The core function of the package is the getData() and getBatch() method.
 You can supply your dimensions,measures,filters and limit to it just like you would in the JSON body of the MAPP DMP API request. If you don't the package will supply defaults for each parameter.
+
+**The package automatically prepends the flx_ prefix to dimensions,meausures and filters if missing**
+
 You can review and even redefine defaults like:
 
 ```r
 
-defaults <- my_dmp$defaults
+defaults <- my_dmp$dictionary$dimensions$default
 print(defaults)
 
 #... do something with the defaults
 
-my_dmp$defaults <- new_defaults
+my_dmp$dictionary$dimensions$default <- 'uuid,event_type'
 
 ```
 
 Just like the Mapp DMP API, the package offers two ways to grab the raw data. The interface to both below methods is identical. The getBatch method offers additional parameters.
 
+**The package automatically splits input parameters separated by comma if needed**
+
 ### 1. getData method
 
-```r
 
+
+```r
 #returns a json formatted response
 f <-list(
   list(dimension="date",date_start="2016-12-01",date_end=as.chaer(Sys.Date())),
