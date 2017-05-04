@@ -1,3 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
+R/api.R
+R/run_dmp.R
+R/populate_custom_data.R
