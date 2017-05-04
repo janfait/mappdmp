@@ -62,8 +62,6 @@ Just like the Mapp DMP API, the package offers two ways to grab the raw data. Th
 
 ### 1. getData method
 
-
-
 ```r
 #returns a json formatted response
 f <-list(
@@ -73,8 +71,15 @@ f <-list(
 d <- 'flx_date,flx_event_type,flx_uuid'
 m <- 'flx_interactions_dmp,flx_clicks_dmp'
 
-my_dmp$data$mapp <- dmp$getData(dimensions=d,measures=m,filters=f)
+my_data <- my_dmp$getData(dimensions=d,measures=m,filters=f)
 ```
+
+The package offers a $data field for convenience and a $saveData() method which saves the slot content as .rds file to a specified destination:
+
+```r
+my_data$data$test <- dmp$getData(dimensions=d,measures=m,filters=f)
+
+try(my_dmp$saveData(slot="test","/my_folder/test.rds"))
 
 ### 2. getBatch method
 
@@ -95,7 +100,7 @@ f <-list(
 d <- 'flx_date,flx_event_type,flx_uuid'
 m <- 'flx_interactions_dmp,flx_clicks_dmp'
 
-my_dmp$data$mapp <- dmp$getBatch(dimensions=d,measures=m,filters=f)
+my_data <- my_dmp$getBatch(dimensions=d,measures=m,filters=f)
 
 ```
 The export you have already generated can be retrieved by
