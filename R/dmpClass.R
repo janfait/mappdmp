@@ -1,17 +1,4 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
+
 
 mappDmp <- setRefClass("mappDmp",
                        fields=list(
@@ -24,13 +11,14 @@ mappDmp <- setRefClass("mappDmp",
                          authentication = "list",
                          dictionary = "list",
                          cache = "list",
-                         log="character"
+                         data = "list",
+                         log="character",
+                         filter = "list"
                        ),
                        methods=list(
                          debugPrint = function(x){
                            if(.self$debug){
                              str(x)
-                           }else{
                              invisible(.self$log <- paste(.self$log,print(x),"\n"))
                            }
                          },
@@ -41,13 +29,13 @@ mappDmp <- setRefClass("mappDmp",
                            }
                          },
                          validateFilters = function(input){
-
+                           
                            if(missing(input)){
                              .self$debugPrint("Running with defualt date filters")
                              output <- .self$dictionary$filters$default
                              return(output)
                            }
-
+                           
                            if(is.list(input)){
                              if("date" %in% unlist(input) & "date_start" %in% names(unlist(input)) & "date_end" %in% names(unlist(input))){
                                if(all(sapply(input,is.list)) & sum(sapply(input,is.list))==length(input)){
@@ -64,10 +52,10 @@ mappDmp <- setRefClass("mappDmp",
                            return(output)
                          },
                          validateIdentifiers = function(input){
-
+                           
                            what <- deparse(substitute(input))
                            .self$debugPrint(paste("Validating",what))
-
+                           
                            if(missing(input)){
                              output <- .self$dictionary[[what]]$default
                              output <- unlist(strsplit(output,","))
@@ -167,10 +155,10 @@ mappDmp <- setRefClass("mappDmp",
                              return(data)
                            }else{
                              return(callContent)
-                           }
+                           } 
                          },
                          getNames = function(dimension=character(),search=NULL){
-
+                           
                            if(substring(dimension,1,3)!='flx'){
                              dimension <- paste0("flx_",dimension)
                            }
@@ -182,10 +170,10 @@ mappDmp <- setRefClass("mappDmp",
                              return(data)
                            }else{
                              return(callContent)
-                           }
+                           } 
                          },
                          makeUrlCategories = function(data,sitemap){
-
+                           
                            if("event_url_trunc" %in% colnames(data)){
                              if(!is.null(sitemap)){
                                .self$dictionary$sitemap <- read.csv(sitemap,header=T,stringsAsFactors = F,sep=";")
@@ -193,12 +181,12 @@ mappDmp <- setRefClass("mappDmp",
                              }else{
                                .self$debugPrint("Path to sitemap not provided")
                              }
-
+                             
                            }else{
                              print("Cannot categorize URL because the 'event_url' dimension is missing in the data")
                            }
                            return(data)
-
+                           
                          },
                          makeNewVars = function(data){
                            if(.self$settings$makeNewVars){
@@ -338,21 +326,84 @@ mappDmp <- setRefClass("mappDmp",
                            )
                            .self$debugPrint("Initializing Mapp DMP instance")
                            invisible(.self$loadPackages())
-                           .self$root <- "https://platform.flxone.com/api"
-                           .self$endpoints <- list(
-                             auth=paste0(.self$root,"/auth"),
-                             api=paste0(.self$root,"/"),
-                             data=paste0(.self$root,"/viz/data"),
-                             batch=paste0(.self$root,"/viz/batch-export"),
-                             listexports=paste0(.self$root,"/viz/list-exports"),
-                             export=paste0(.self$root,"/viz/export"),
-                             names=paste0(.self$root,"/report-central/search"),
-                             trackinglist = paste0(.self$root,"/tracking/list")
-                           )
-                           .self$cache <- list()
-                           if(!.self$login()){
-                             stop("Authentication has failed, please check your credentials")
-                           }
-                         }
+                           .self$root <- "https://platfodmp,unique_users_approx_dmp",
+                           default="uuid,date,timestamp,pixel_id,event_type,segment_dmp,conversion_dmp,event_referer_url,event_url,interaction_type,interaction_pagescroll,interaction_timeonsite",
+                           named="segment_dmp,conversion_dmp,interaction_type,event_type"
+                       ),
+                       measures = list(
+                         all = "impressions_dmp,interactions_dmp,clicks_dmp",
+                         default = "impressions_dmp,interactions_dmp,clicks_dmp,"
+                       ),
+                       filters = list(
+                         default =      }
+                       },
+saveData = function(slot=NULL,filename=NULL){
+  if(is.null(filename)){
+    filename <- paste(.self$paths$store,"dmp.rds")
+  }
+  if(is.null(slot)){
+    d <- .self$data$latest
+  }else{
+    d <- .self$data[[slot]]
+  }
+  .self$debugPrint(paste("Saving to",filename))
+  saveRDS(d,filename)
+  return(TRUE)
+},
+initialize = function(username,password,debug=FALSE){
+  #set parameters to fields
+  .self$settings <- list()
+  .self$settings$makeLabels <- F
+  .self$settings$makeNewVars <- F
+  .self$paths$store <- getwd()
+  .self$debug <- debug
+  .self$username <- username
+  .self$password <- password
+  .self$data <- list()
+  #set dictionary
+  .self$dictionary <- list(
+    dimensions = list(
+      all="advertiser_id,auction_id,browser,buyer_id,campaign_id,conversion_dmp,creative_id,creative_size,date,day_in_month,day_in_week,day_in_year,destination_url,device_brand,device_id_md5,device_id_sha1,device_id_openudid,device_id_odin,device_id_apple_ida,device_id_google_adid,device_type,event_referer_url,event_type,event_url,external_data,external_pixel_id,geo_city,geo_country,geo_lat,geo_long,geo_region,hour,insertion_order_id,interaction_type,interaction_value,lineitem_id,month_in_year,operating_system,pixel_id,placement_id,platform,platform_exchange,publisher_id,segment_dmp,seller_id,site_domain,site_id,site_type,timestamp,user_agent,user_ip,user_ip_truncated,uuid,week_in_year,clicks_dmp,impressions_dmp,interaction_adhover,interaction_pagescroll,interaction_timeonsite,interactions_dmp,pixel_loads_dmp,record_sum,total_events_dmp,unique_users_approx_dmp",
+      default="uuid,date,timestamp,pixel_id,event_type,segment_dmp,conversion_dmp,event_referer_url,event_url,interaction_type,interaction_pagescroll,interaction_timeonsite",
+      named="segment_dmp,conversion_dmp,interaction_type,event_type"
+    ),
+    measures = list(
+      all = "impressions_dmp,interactions_dmp,clicks_dmp",
+      default = "impressions_dmp,interactions_dmp,clicks_dmp,"
+    ),
+    filters = list(
+      default = as.data.frame(list(dimension = "date", date_start=Sys.Date()-30, date_end = Sys.Date()),stringsAsFactors = F)
+    ),
+    limit = list(
+      default = "1000",
+      maxvolume = "10000000"
+    )
+  )
+  .self$debugPrint("Initializing Mapp DMP instance")
+  invisible(.self$loadPackages())
+  .self$root <- "https://platform.flxone.com/api"
+  .self$endpoints <- list(
+    auth=paste0(.self$root,"/auth"),
+    api=paste0(.self$root,"/"),
+    data=paste0(.self$root,"/viz/data"),
+    batch=paste0(.self$root,"/viz/batch-export"),
+    listexports=paste0(.self$root,"/viz/list-exports"),
+    export=paste0(.self$root,"/viz/export"),
+    names=paste0(.self$root,"/report-central/search"),
+    trackinglist = paste0(.self$root,"/tracking/list")
+  )
+  .self$cache <- list()
+  if(!.self$login()){
+    stop("Authentication has failed, please check your credentials")
+  }
+}
                        )
 )
+
+
+
+
+
+
+
+
