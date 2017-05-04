@@ -255,19 +255,26 @@ mappDmp <- setRefClass("mappDmp",
                              return(callContent)
                            }
                          },
-                         getExport = function(id){
+                         getExport = function(id,keepFile=F){
                            url <- paste0(.self$endpoints$export,"?id=",id)
                            call <- GET(url,config(verbose=.self$debug))
-                           tmp<- tempfile()
-                           try(writeBin(content(call,"raw"), tmp))
-                           data<-read.csv(tmp,sep=",",header=T,stringsAsFactors=F)
-                           rm(tmp)
-                           colnames(data)<-gsub("flx_","",colnames(data))
-                           data <- .self$makeLabels(data)
-                           data <- .self$makeNewVars(data)
-                           return(data)
+                           if(keepFile){
+                             tmp<- paste0(getwd(),"/MappDmpExport_",id,".csv")
+                             try(writeBin(content(call,"raw"), tmp))
+                             return(tmp)
+                           }else{
+                             tmp<- tempfile()
+                             try(writeBin(content(call,"raw"), tmp))
+                             data<-read.csv(tmp,sep=",",header=T,stringsAsFactors=F)
+                             rm(tmp)
+                             colnames(data)<-gsub("flx_","",colnames(data))
+                             data <- .self$makeLabels(data)
+                             data <- .self$makeNewVars(data)
+                             return(data)
+                           }
+
                          },
-                         getBatch = function(dimensions,measures,filters,period=10,attempts=20,makeLabels=F,makeNewVars=F){
+                         getBatch = function(dimensions,measures,filters,period=10,attempts=20,keepFile=F,makeLabels=F,makeNewVars=F){
                            .self$settings$makeLabels <- makeLabels
                            .self$settings$makeNewVars <- makeNewVars
                            query <- .self$prepareQuery(dimensions,measures,filters,limit=.self$dictionary$limit$maxvolume)
@@ -286,11 +293,11 @@ mappDmp <- setRefClass("mappDmp",
                                .self$debugPrint(paste("Attempt number",attemptCounter))
                                attemptCounter <- attemptCounter+1
                              }
-                             export <- .self$getExport(exportId)
+                             export <- .self$getExport(exportId,keepFile=keepFile)
                              return(export)
                            }else if(callContent$response$status=="ERROR" & grepl("This report has already",callContent$response$error)){
                              exportId <- callContent$response$id
-                             export <- .self$getExport(exportId)
+                             export <- .self$getExport(exportId,keepFile=keepFile)
                              return(export)
                            }else{
                              return(callContent)
