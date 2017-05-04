@@ -60,7 +60,7 @@ Just like the Mapp DMP API, the package offers two ways to grab the raw data. Th
 
 **The package automatically splits input parameters separated by comma if needed**
 
-### 1. getData method
+### 1. $getData() method
 
 ```r
 #returns a json formatted response
@@ -81,7 +81,7 @@ my_data$data$test <- dmp$getData(dimensions=d,measures=m,filters=f)
 
 try(my_dmp$saveData(slot="test","/my_folder/test.rds"))
 
-### 2. getBatch method
+### 2. $getBatch() method
 
 A request to the batch-export endpoint is much more complicated that the simple immediate export. The package submits the export request and continues to check its status by querying the viz/list-exports endpoint periodically until it has been completed.
 You can specify the period by the period parameter.
@@ -100,9 +100,16 @@ f <-list(
 d <- 'flx_date,flx_event_type,flx_uuid'
 m <- 'flx_interactions_dmp,flx_clicks_dmp'
 
-my_data <- my_dmp$getBatch(dimensions=d,measures=m,filters=f)
+my_data <- my_dmp$getBatch(dimensions=d,measures=m,filters=f,period=10,keepFile=F)
 
 ```
+Behind the scenes, the package executes calls to the $getExports() method which delivers a list of existing exports and their states
+
+```r
+exports <- my_dmp$getExports()
+
+```
+
 The export you have already generated can be retrieved by
 
 ```r
