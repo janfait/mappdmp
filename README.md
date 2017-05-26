@@ -23,6 +23,7 @@ library("mappdmp")
 ```
 or simply source the main class dmpClass.R in the R folder which contains all the code.
 
+
 ### Initialize
 All you need really are the login credentials. To understand what the package is doing in the background, you can initialize it 
 with debug=T parameter. 
