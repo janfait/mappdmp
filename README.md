@@ -40,7 +40,7 @@ my_dmp$login()
 ## Getting Data
 
 The core function of the package is the getData() and getBatch() method.
-You can supply your dimensions,measures,filters and limit to it just like you would in the JSON body of the MAPP DMP API request. If you don't the package will supply defaults for each parameter.
+You can supply your dimensions,measures,filters and limit to it just like you would in the JSON body of the MAPP DMP API request, except that you can choose between a list() or a single concatenated string. For each input, the package will supply defaults if omitted by user.
 
 **The package automatically prepends the flx_ prefix to dimensions,meausures and filters if missing**
 
@@ -63,6 +63,7 @@ Just like the Mapp DMP API, the package offers two ways to grab the raw data. Th
 
 ### 1. $getData() method
 
+
 ```r
 #returns a json formatted response
 f <-list(
@@ -82,13 +83,15 @@ my_data$data$test <- dmp$getData(dimensions=d,measures=m,filters=f)
 
 try(my_dmp$saveData(slot="test","/my_folder/test.rds"))
 
+```
+
 ### 2. $getBatch() method
 
 A request to the batch-export endpoint is much more complicated that the simple immediate export. The package submits the export request and continues to check its status by querying the viz/list-exports endpoint periodically until it has been completed.
-You can specify the period by the period parameter.
+You can specify the period of querying by the period (seconds) parameter.
 
 This will request the export, wait for its execution and once ready, stream the content of the export into a temporary file in the current working directory which is deleted once the data has been loaded into a data frame.
-If keepFile = TRUE, the export is stored in the working directory under a name 'MappDmpExport_YOUREXPORTID.csv' and the function only returns this filename. 
+If getContent = FALSE, the export is stored in the working directory under a name 'MappDmpExport_YOUREXPORTID.csv' and the function only returns this filename. 
 
 
 ```r
@@ -101,7 +104,7 @@ f <-list(
 d <- 'flx_date,flx_event_type,flx_uuid'
 m <- 'flx_interactions_dmp,flx_clicks_dmp'
 
-my_data <- my_dmp$getBatch(dimensions=d,measures=m,filters=f,period=10,keepFile=F)
+my_data <- my_dmp$getBatch(dimensions=d,measures=m,filters=f,period=10,getContent=T)
 
 ```
 Behind the scenes, the package executes calls to the $getExports() method which delivers a list of existing exports and their states
@@ -115,7 +118,29 @@ The export you have already generated can be retrieved by
 
 ```r
 my_export_id <- 44800
-my_data <- my_dmp$getExport(id=my_export_id)
+my_data <- my_dmp$getExport(id=my_export_id,getContent=T)
 
 
 ```
+### Analytical functions
+
+The package has multiple analytical functions which make you more productive when working with the data
+
+removeInvalidUsers
+
+createSessionData
+
+getUniqueUsers
+
+getCustomEvents
+
+applyFilter
+
+
+
+
+
+
+
+
+

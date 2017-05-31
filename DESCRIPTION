@@ -8,4 +8,4 @@ Maintainer: Jan Faitr <jan.fait@mapp.com>
 Description: The package provides user with an instance of mappdmp class which allows the user to query data (both stateless and batch exports) from Mapp's DMP in simple one-line manner.
 License: AGPL-3
 LazyData: TRUE
-Imports: jsonlite, lubridate, httr, urltools
+Imports: jsonlite, lubridate, httr, urltools, dplyr, reshape2

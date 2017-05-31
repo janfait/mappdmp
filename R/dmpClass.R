@@ -429,7 +429,7 @@ mappDmp <- setRefClass("mappDmp",
    if(getContent){
      file<- tempfile()
      try(writeBin(content(call,"raw"), file))
-     data<-read.csv(tmp,sep=",",header=T,stringsAsFactors=F)
+     data<-read.csv(file,sep=",",header=T,stringsAsFactors=F)
      rm(file)
      colnames(data)<-gsub("flx_","",colnames(data))
      data <- .self$makeLabels(data)
